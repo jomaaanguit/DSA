@@ -10,17 +10,17 @@
 using namespace std;
 
 class StudentRecord {
-private:
-/*string name,
-         birthdate,
-         sex,
-         maritalstatus,
-         bloodtype,
-         nationality, 
-         dateofissue,
-         category,
-         email,
-         address;*/
+private:  
+    string Name, 
+         Birthdate,
+         Sex,
+         Maritalstatus,
+         Bloodtype, 
+         Nationality,
+         Dateofissue,
+         Category, 
+         Email, 
+         Address;
 public:
     StudentRecord(
         string name,
@@ -59,21 +59,11 @@ public:
         cout << "    Address:        " << Address  << endl << endl;
 
     }
-
-    string Name, 
-            Birthdate,
-            Sex,
-            Maritalstatus,
-            Bloodtype, 
-            Nationality,
-            Dateofissue,
-            Category, 
-            Email, 
-            Address;
 };
 
 void displayStudents(vector<StudentRecord>& students) {
 
+    
     for (auto student : students) {
         student.display();
     }
@@ -83,7 +73,7 @@ int main()
 {
     ifstream inputFile;
     //inputFile.open("C:\\temp\\student-records.csv");
-    inputFile.open("C:\\Users\\Admin\\Desktop\\CS\\C++\\data.csv");
+    inputFile.open("C:\\Users\\Admin\\Desktop\\CS\\Final_Project\\DSA\\data.csv");
     string line = "";
 
     vector<StudentRecord> students;
