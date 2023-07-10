@@ -3,29 +3,27 @@
 #include <string>
 #include <limits>
 
-using namespace std;
-
 struct Node {
-    string pcn;
-    string last_name;
-    string given_name;
-    string middle_name;
-    string birthdate;
-    string sex;
-    string marital_status;
-    string blood_type;
-    string nationality;
-    string date_of_issue;
-    string email_address;
-    string home_address;
-    string tag;
+    std::string pcn;
+    std::string last_name;
+    std::string given_name;
+    std::string middle_name;
+    std::string birthdate;
+    std::string sex;
+    std::string marital_status;
+    std::string blood_type;
+    std::string nationality;
+    std::string date_of_issue;
+    std::string email_address;
+    std::string home_address;
+    std::string tag;
     Node* next = nullptr;
 };
 
 class Profile {
     Node* head = nullptr;
     Node* tail = nullptr;
-    string filename = "profiles.txt";
+    std::string filename = "profiles.txt";
 
 public:
     Profile() {
@@ -33,27 +31,27 @@ public:
     }
 
     void loadProfilesFromFile() {
-        ifstream file(filename);
+        std::ifstream file(filename);
         if (file.is_open()) {
-            string line;
+            std::string line;
             Node* current = nullptr;
 
-            while (getline(file, line)) {
+            while (std::getline(file, line)) {
                 if (line.find("PCN: ") == 0) {
                     current = new Node;
                     current->pcn = line.substr(5);
-                    getline(file, current->last_name);
-                    getline(file, current->given_name);
-                    getline(file, current->middle_name);
-                    getline(file, current->birthdate);
-                    getline(file, current->sex);
-                    getline(file, current->marital_status);
-                    getline(file, current->blood_type);
-                    getline(file, current->nationality);
-                    getline(file, current->date_of_issue);
-                    getline(file, current->email_address);
-                    getline(file, current->home_address);
-                    getline(file, current->tag);
+                    std::getline(file, current->last_name);
+                    std::getline(file, current->given_name);
+                    std::getline(file, current->middle_name);
+                    std::getline(file, current->birthdate);
+                    std::getline(file, current->sex);
+                    std::getline(file, current->marital_status);
+                    std::getline(file, current->blood_type);
+                    std::getline(file, current->nationality);
+                    std::getline(file, current->date_of_issue);
+                    std::getline(file, current->email_address);
+                    std::getline(file, current->home_address);
+                    std::getline(file, current->tag);
 
                     current->next = nullptr;
 
@@ -69,34 +67,34 @@ public:
 
             file.close();
         } else {
-            cout << "Failed to open file!" << endl;
+            std::cout << "Failed to open file!" << std::endl;
         }
     }
 
  void updateProfilesFile() {
-    ofstream file(filename);
+    std::ofstream file(filename);
     if (file.is_open()) {
         Node* current = head;
         while (current != nullptr) {
-            file << "PCN: " << current->pcn << endl;
-            file << current->last_name << endl;
-            file << current->given_name << endl;
-            file << current->middle_name << endl;
-            file << current->birthdate << endl;
-            file << current->sex << endl;
-            file << current->marital_status << endl;
-            file << current->blood_type << endl;
-            file << current->nationality << endl;
-            file << current->date_of_issue << endl;
-            file << current->email_address << endl;
-            file << current->home_address << endl;
-            file << current->tag << endl;
-            file << endl;
+            file << "PCN: " << current->pcn << std::endl;
+            file << current->last_name << std::endl;
+            file << current->given_name << std::endl;
+            file << current->middle_name << std::endl;
+            file << current->birthdate << std::endl;
+            file << current->sex << std::endl;
+            file << current->marital_status << std::endl;
+            file << current->blood_type << std::endl;
+            file << current->nationality << std::endl;
+            file << current->date_of_issue << std::endl;
+            file << current->email_address << std::endl;
+            file << current->home_address << std::endl;
+            file << current->tag << std::endl;
+            file << std::endl;
             current = current->next;
         }
         file.close();
     } else {
-        cout << "Failed to open file!" << endl;
+        std::cout << "Failed to open file!" << std::endl;
     }
 }
 
@@ -104,32 +102,32 @@ public:
     void add_profile() {
         Node* new_profile = new Node;
 
-        cout << "Enter PCN (Ex. xxxx-xxxx-xxxx-xxxx): ";
-        getline(cin >> ws, new_profile->pcn);
-        cout << "Enter Last Name: ";
-        getline(cin >> ws, new_profile->last_name);
-        cout << "Enter Given Name: ";
-        getline(cin >> ws, new_profile->given_name);
-        cout << "Enter Middle Name: ";
-        getline(cin >> ws, new_profile->middle_name);
-        cout << "Enter Birthdate (Ex. mm/dd/yyyy): ";
-        getline(cin >> ws, new_profile->birthdate);
-        cout << "Enter Sex (Ex. Male/Female): ";
-        getline(cin >> ws, new_profile->sex);
-        cout << "Enter Marital Status (Ex. Single/Married): ";
-        getline(cin >> ws, new_profile->marital_status);
-        cout << "Enter Blood Type (Ex. O+): ";
-        getline(cin >> ws, new_profile->blood_type);
-        cout << "Enter Nationality (Ex. Filipino): ";
-        getline(cin >> ws, new_profile->nationality);
-        cout << "Enter Date of Issue: ";
-        getline(cin >> ws, new_profile->date_of_issue);
-        cout << "Enter Email Address (Ex. juandelacruz@gmail.com): ";
-        getline(cin >> ws, new_profile->email_address);
-        cout << "Enter Home Address: ";
-        getline(cin >> ws, new_profile->home_address);
-        cout << "Enter Tag (Positive or Negative): ";
-        getline(cin >> ws, new_profile->tag);
+        std::cout << "Enter PCN (Ex. xxxx-xxxx-xxxx-xxxx): ";
+        std::getline(std::cin >> std::ws, new_profile->pcn);
+        std::cout << "Enter Last Name: ";
+        std::getline(std::cin >> std::ws, new_profile->last_name);
+        std::cout << "Enter Given Name: ";
+        std::getline(std::cin >> std::ws, new_profile->given_name);
+        std::cout << "Enter Middle Name: ";
+        std::getline(std::cin >> std::ws, new_profile->middle_name);
+        std::cout << "Enter Birthdate (Ex. mm/dd/yyyy): ";
+        std::getline(std::cin >> std::ws, new_profile->birthdate);
+        std::cout << "Enter Sex (Ex. Male/Female): ";
+        std::getline(std::cin >> std::ws, new_profile->sex);
+        std::cout << "Enter Marital Status (Ex. Single/Married): ";
+        std::getline(std::cin >> std::ws, new_profile->marital_status);
+        std::cout << "Enter Blood Type (Ex. O+): ";
+        std::getline(std::cin >> std::ws, new_profile->blood_type);
+        std::cout << "Enter Nationality (Ex. Filipino): ";
+        std::getline(std::cin >> std::ws, new_profile->nationality);
+        std::cout << "Enter Date of Issue: ";
+        std::getline(std::cin >> std::ws, new_profile->date_of_issue);
+        std::cout << "Enter Email Address (Ex. juandelacruz@gmail.com): ";
+        std::getline(std::cin >> std::ws, new_profile->email_address);
+        std::cout << "Enter Home Address: ";
+        std::getline(std::cin >> std::ws, new_profile->home_address);
+        std::cout << "Enter Tag (Positive or Negative): ";
+        std::getline(std::cin >> std::ws, new_profile->tag);
 
         new_profile->next = nullptr;
 
@@ -141,32 +139,33 @@ public:
             tail = new_profile;
         }
 
-        ofstream file(filename, ios::app);
+        std::ofstream file(filename, std::ios::app);
         if (file.is_open()) {
-            file << "PCN: " << new_profile->pcn << endl;
-            file << "Last Name: " << new_profile->last_name << endl;
-            file << "Given Name: " << new_profile->given_name << endl;
-            file << "Middle Name: " << new_profile->middle_name << endl;
-            file << "Birthdate: " << new_profile->birthdate << endl;
-            file << "Sex: " << new_profile->sex << endl;
-            file << "Marital Status: " << new_profile->marital_status << endl;
-            file << "Blood Type: " << new_profile->blood_type << endl;
-            file << "Nationality: " << new_profile->nationality << endl;
-            file << "Date of Issue: " << new_profile->date_of_issue << endl;
-            file << "Email Address: " << new_profile->email_address << endl;
-            file << "Home Address: " << new_profile->home_address << endl;
-            file << "Tag: " << new_profile->tag << endl;
-            file << endl;
+            file << "PCN: " << new_profile->pcn << std::endl;
+            file << "Last Name: " << new_profile->last_name << std::endl;
+            file << "Given Name: " << new_profile->given_name << std::endl;
+            file << "Middle Name: " << new_profile->middle_name << std::endl;
+            file << "Birthdate: " << new_profile->birthdate << std::endl;
+            file << "Sex: " << new_profile->sex << std::endl;
+            file << "Marital Status: " << new_profile->marital_status << std::endl;
+            file << "Blood Type: " << new_profile->blood_type << std::endl;
+            file << "Nationality: " << new_profile->nationality << std::endl;
+            file << "Date of Issue: " << new_profile->date_of_issue << std::endl;
+            file << "Email Address: " << new_profile->email_address << std::endl;
+            file << "Home Address: " << new_profile->home_address << std::endl;
+            file << "Tag: " << new_profile->tag << std::endl;
+            file << std::endl;
             file.close();
         } else {
-            cout << "Failed to open file!" << endl;
+            std::cout << "Failed to open file!" << std::endl;
         }
     }
 
     void delete_profile() {
-        string pcn;
-        cout << "Enter the PCN of the profile you want to delete: ";
-        cin >> pcn;
+        std::string pcn;
+        std::cout << "Enter the PCN of the profile you want to delete: ";
+        std::cin >> pcn;
+        std::cout << std::endl; 
 
         Node* current = head;
         Node* previous = nullptr;
@@ -187,7 +186,7 @@ public:
                 }
 
                 delete current;
-                cout << "The profile with PCN: " << pcn << " is successfully deleted" << endl << endl;
+                std::cout << "The profile with PCN: " << pcn << " is successfully deleted" << std::endl << std::endl;
                 break;
             }
 
@@ -196,37 +195,43 @@ public:
         }
 
         if (!found) {
-            cout << "The profile with PCN: " << pcn << " does not exist" << endl << endl;
+            std::cout << "The profile with PCN: " << pcn << " does not exist" << std::endl << std::endl;
         }        updateProfilesFile();
     }
 
 void display() {
     Node* current = head;
+
+    if (current == nullptr) {
+        std::cout << "No profile found..." << std::endl << std::endl;
+        return;
+    }
+
     while (current != nullptr) {
-        cout << "PCN: " << current->pcn << endl;
-        cout << "Last Name: " << current->last_name << endl;
-        cout << "Given Name: " << current->given_name << endl;
-        cout << "Middle Name: " << current->middle_name << endl;
-        cout << "Birthdate: " << current->birthdate << endl;
-        cout << "Sex: " << current->sex << endl;
-        cout << "Marital Status: " << current->marital_status << endl;
-        cout << "Blood Type: " << current->blood_type << endl;
-        cout << "Nationality: " << current->nationality << endl;
-        cout << "Date of Issue: " << current->date_of_issue << endl;
-        cout << "Email Address: " << current->email_address << endl;
-        cout << "Home Address: " << current->home_address << endl;
-        cout << "Tag: " << current->tag << endl;
-        cout << endl;
+        std::cout << "PCN: " << current->pcn << std::endl;
+        std::cout << "Last Name: " << current->last_name << std::endl;
+        std::cout << "Given Name: " << current->given_name << std::endl;
+        std::cout << "Middle Name: " << current->middle_name << std::endl;
+        std::cout << "Birthdate: " << current->birthdate << std::endl;
+        std::cout << "Sex: " << current->sex << std::endl;
+        std::cout << "Marital Status: " << current->marital_status << std::endl;
+        std::cout << "Blood Type: " << current->blood_type << std::endl;
+        std::cout << "Nationality: " << current->nationality << std::endl;
+        std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
+        std::cout << "Email Address: " << current->email_address << std::endl;
+        std::cout << "Home Address: " << current->home_address << std::endl;
+        std::cout << "Tag: " << current->tag << std::endl;
+        std::cout << std::endl;
         current = current->next;
     }
 }
 
 
     void search() {
-        string pcn;
-        cout << "Enter the PCN of the profile you want to search: ";
-        cin >> pcn;
-        cout << endl;
+        std::string pcn;
+        std::cout << "Enter the PCN of the profile you want to search: ";
+        std::cin >> pcn;
+        std::cout << std::endl;
 
         Node* current = head;
         bool found = false;
@@ -234,23 +239,23 @@ void display() {
         while (current != nullptr) {
             if (current->pcn == pcn) {
                 found = true;
-                cout << "PCN: " << current->pcn << endl;
-                cout << "Full name: " << current->last_name << ", " << current->given_name << " " << current->middle_name << endl;
-                cout << "Birthdate: " << current->birthdate << endl;
-                cout << "Sex: " << current->sex << endl;
-                cout << "Marital Status: " << current->marital_status << endl;
-                cout << "Blood Type: " << current->blood_type << endl;
-                cout << "Nationality: " << current->nationality << endl;
-                cout << "Date of Issue: " << current->date_of_issue << endl;
-                cout << "Email Address: " << current->email_address << endl;
-                cout << "Tag: " << current->tag << endl;
-                cout << endl;
+                std::cout << "PCN: " << current->pcn << std::endl;
+                std::cout << "Full name: " << current->last_name << ", " << current->given_name << " " << current->middle_name << std::endl;
+                std::cout << "Birthdate: " << current->birthdate << std::endl;
+                std::cout << "Sex: " << current->sex << std::endl;
+                std::cout << "Marital Status: " << current->marital_status << std::endl;
+                std::cout << "Blood Type: " << current->blood_type << std::endl;
+                std::cout << "Nationality: " << current->nationality << std::endl;
+                std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
+                std::cout << "Email Address: " << current->email_address << std::endl;
+                std::cout << "Tag: " << current->tag << std::endl;
+                std::cout << std::endl;
             }
             current = current->next;
         }
 
         if (!found) {
-            cout << "The profile with PCN: " << pcn << " does not exist" << endl << endl;
+            std::cout << "The profile with PCN: " << pcn << " does not exist" << std::endl << std::endl;
         }
     }
 };
@@ -261,23 +266,23 @@ int main() {
 
     do {
         system("cls");
-        cout << "PROFILE ADD/DELETE/DISPLAY/SEARCH" << endl << endl;
-        cout << "[1] ADD PROFILE" << endl;
-        cout << "[2] DELETE PROFILE" << endl;
-        cout << "[3] DISPLAY ALL PROFILES" << endl;
-        cout << "[4] SEARCH PROFILE" << endl;
-        cout << "[5] EXIT PROGRAM" << endl << endl;
-        cout << "ENTER CHOICE (1-5): ";
-        cin >> choice;
+        std::cout << "PROFILE ADD/DELETE/DISPLAY/SEARCH" << std::endl << std::endl;
+        std::cout << "[1] ADD PROFILE" << std::endl;
+        std::cout << "[2] DELETE PROFILE" << std::endl;
+        std::cout << "[3] DISPLAY ALL PROFILES" << std::endl;
+        std::cout << "[4] SEARCH PROFILE" << std::endl;
+        std::cout << "[5] EXIT PROGRAM" << std::endl << std::endl;
+        std::cout << "ENTER CHOICE (1-5): ";
+        std::cin >> choice;
 
         while (choice < 1 || choice > 5) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "ENTER CHOICE (1-5): ";
-            cin >> choice;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "ENTER CHOICE (1-5): ";
+            std::cin >> choice;
         }
 
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         system("cls");
 
@@ -296,6 +301,6 @@ int main() {
         system("pause");
     } while (choice != 5);
 
-    cout << "Exiting Program..." << endl << endl;
+    std::cout << "Exiting Program..." << std::endl << std::endl;
     return 0;
 }

@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include <string>
+#include <std::string>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -11,7 +11,7 @@ using namespace std;
 
 class StudentRecord {
 private:  
-    string Name, 
+    std::string Name, 
          Birthdate,
          Sex,
          Maritalstatus,
@@ -23,16 +23,16 @@ private:
          Address;
 public:
     StudentRecord(
-        string name,
-        string birthdate,
-        string sex,
-        string maritalstatus,
-        string bloodtype,
-        string nationality, 
-        string dateofissue,
-        string category,
-        string email,
-        string address
+        std::string name,
+        std::string birthdate,
+        std::string sex,
+        std::string maritalstatus,
+        std::string bloodtype,
+        std::string nationality, 
+        std::string dateofissue,
+        std::string category,
+        std::string email,
+        std::string address
     ) {
         Name = name;
         Birthdate = birthdate;
@@ -47,16 +47,16 @@ public:
     }
 
     void display() {    
-        cout << "    Name:           " << Name << endl;
-        cout << "    Birthdate:      " << Birthdate  << endl;
-        cout << "    Sex:            " << Sex  << endl;
-        cout << "    Marital Status: " << Maritalstatus  << endl;
-        cout << "    Blood Type:     " << Bloodtype  << endl;
-        cout << "    Nationality:    " << Nationality  << endl;
-        cout << "    Date of Issue:  " << Dateofissue  << endl;
-        cout << "    Category:       " << Category  << endl;
-        cout << "    Email:          " << Email  << endl;
-        cout << "    Address:        " << Address  << endl << endl;
+        std::cout << "    Name:           " << Name << std::endl;
+        std::cout << "    Birthdate:      " << Birthdate  << std::endl;
+        std::cout << "    Sex:            " << Sex  << std::endl;
+        std::cout << "    Marital Status: " << Maritalstatus  << std::endl;
+        std::cout << "    Blood Type:     " << Bloodtype  << std::endl;
+        std::cout << "    Nationality:    " << Nationality  << std::endl;
+        std::cout << "    Date of Issue:  " << Dateofissue  << std::endl;
+        std::cout << "    Category:       " << Category  << std::endl;
+        std::cout << "    Email:          " << Email  << std::endl;
+        std::cout << "    Address:        " << Address  << std::endl << std::endl;
 
     }
 };
@@ -74,15 +74,15 @@ int main()
     ifstream inputFile;
     //inputFile.open("C:\\temp\\student-records.csv");
     inputFile.open("C:\\Users\\Admin\\Desktop\\CS\\Final_Project\\DSA\\data.csv");
-    string line = "";
+    std::string line = "";
 
     vector<StudentRecord> students;
-    while (getline(inputFile, line)) {
+    while (std::getline(inputFile, line)) {
 
-        stringstream inputString(line);
+        std::stringstream inputstd::string(line);
 
         //StudentId, Last Name, FirstName, Age, Phone Number, GPA
-        string name, 
+        std::string name, 
                 birthdate,
                 sex,
                 maritalstatus,
@@ -93,18 +93,18 @@ int main()
                 email, 
                 address;
 
-        getline(inputString, name, ',');
-        getline(inputString, birthdate, ',');
-        getline(inputString, sex, ',');
-        getline(inputString, maritalstatus, ',');
-        //age = atoi(tempString.c_str());
-        getline(inputString, bloodtype, ',');
-        getline(inputString, nationality, ',');
-        getline(inputString, dateofissue, ',');
-        // gpa = atof(tempString.c_str());
-        getline(inputString, category, ',');
-        getline(inputString, email, ',');
-        getline(inputString, address, ',');
+        std::getline(inputstd::string, name, ',');
+        std::getline(inputstd::string, birthdate, ',');
+        std::getline(inputstd::string, sex, ',');
+        std::getline(inputstd::string, maritalstatus, ',');
+        //age = atoi(tempstd::string.c_str());
+        std::getline(inputstd::string, bloodtype, ',');
+        std::getline(inputstd::string, nationality, ',');
+        std::getline(inputstd::string, dateofissue, ',');
+        // gpa = atof(tempstd::string.c_str());
+        std::getline(inputstd::string, category, ',');
+        std::getline(inputstd::string, email, ',');
+        std::getline(inputstd::string, address, ',');
         StudentRecord student(
                 name, 
                 birthdate,
