@@ -93,7 +93,7 @@ public:
 		{
 			Node* new_profile_2 = head;
 
-			while (new_profile_2 != nullptr)
+			while (new_profile_2->next != nullptr)
 				new_profile_2 = new_profile_2->next;
 
 			new_profile_2->next = new_profile_1;
@@ -110,7 +110,7 @@ public:
 
 		if (current == nullptr)
 		{
-			std::cout << "The PCN does not exist... " << std::endl;
+			std::cout << "No profile exists... " << std::endl;
 			return;
 		}
 		else
@@ -137,6 +137,12 @@ public:
 				{
 					previous = current;
 					current = current->next;
+
+					if (current == nullptr)
+					{
+						std::cout << "The PCN does not exist... " << std::endl;
+						return;
+					}
 				}
 			}
 
@@ -185,7 +191,7 @@ public:
 
 		if (current == nullptr)
 		{
-			std::cout << "the PCN does not exist..." << std::endl;
+			std::cout << "No profile/s found3..." << std::endl;
 			return;
 		}
 		else
@@ -211,11 +217,19 @@ public:
 				{
 					previous = current;
 					current = current->next;
+
+					if (current == nullptr)
+					{
+						std::cout << "The PCN does not exist... " << std::endl;
+						return;
+					}
 				}
 			}
 		}
 		std::cout << std::endl;
 	}
+
+	
 };
 
 int main()
