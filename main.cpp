@@ -2,6 +2,163 @@
 #include <fstream>
 #include <string>
 #include <limits>
+#include <regex>
+#include <cctype>
+#include <algorithm>
+
+bool isValidPCN(const std::string& pcn) {
+    std::regex pcnPattern(R"(\d{4}-\d{4}-\d{4}-\d{4})");
+    return std::regex_match(pcn, pcnPattern);
+}
+
+std::string getValidPCNInput() {
+    std::string input;
+    std::cout << "Enter PCN (xxxx-xxxx-xxxx-xxxx): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidPCN(input)) {
+        std::cout << "Invalid PCN format. Enter PCN: ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidName(const std::string& name) {
+    bool capitalLetterExpected = true;
+
+    for (char c : name) {
+        if (std::isspace(c)) {
+            capitalLetterExpected = true;
+        }
+        else if (capitalLetterExpected && std::isalpha(c)) {
+            if (!std::isupper(c)) {
+                return false;
+            }
+            capitalLetterExpected = false;
+        }
+        else if (!capitalLetterExpected && std::isalpha(c)) {
+            if (!std::islower(c)) {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    return !name.empty();
+}
+
+std::string getValidNameInput(const std::string& fieldName) {
+    std::string input;
+    std::cout << "Enter " << fieldName << ": ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidName(input)) {
+        std::cout << "Invalid " << fieldName << ". Enter " << fieldName << ": ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidDate(const std::string& birthdate) {
+    std::regex birthdatePattern(R"(^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(19|20)\d\d$)");
+    return std::regex_match(birthdate, birthdatePattern);
+}
+
+std::string getValidDateInput(const std::string& fieldName) {
+    std::string input;
+    std::cout << "Enter " << fieldName << " (mm/dd/yyyy): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidDate(input)) {
+        std::cout << "Invalid " << fieldName << ". Enter " << fieldName;
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidBloodType(const std::string& bloodType) {
+    std::regex bloodTypePattern(R"(^(A|B|AB|O)[+-]$)");
+    return std::regex_match(bloodType, bloodTypePattern);
+}
+
+std::string getValidBloodTypeInput() {
+    std::string input;
+    std::cout << "Enter Blood Type (Ex. O+): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidBloodType(input)) {
+        std::cout << "Invalid Blood Type. Enter Blood Type (Ex. O+): ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidEmailAddress(const std::string& emailAddress) {
+    std::regex emailPattern(R"(^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$)");
+    return std::regex_match(emailAddress, emailPattern);
+}
+
+std::string getValidEmailAddressInput() {
+    std::string input;
+    std::cout << "Enter Email Address (Ex. example@mail.com): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidEmailAddress(input)) {
+        std::cout << "Invalid Email Address. Enter Email Address: ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+template <typename Validator>
+std::string getInput(const std::string& prompt, const std::string& errorMessage, Validator validator) {
+    std::string input;
+    std::cout << prompt;
+    std::getline(std::cin >> std::ws, input);
+
+    while (!validator(input)) {
+        std::cout << errorMessage;
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidTag(const std::string& tag) {
+    std::string uppercaseTag = tag;
+    std::transform(uppercaseTag.begin(), uppercaseTag.end(), uppercaseTag.begin(), [](unsigned char c) {
+        return std::toupper(c);
+        });
+
+    return uppercaseTag == "POSITIVE" || uppercaseTag == "NEGATIVE";
+}
+
+bool isValidSex(const std::string& sex) {
+    std::string uppercaseSex = sex;
+    std::transform(uppercaseSex.begin(), uppercaseSex.end(), uppercaseSex.begin(), [](unsigned char c) {
+        return std::toupper(c);
+        });
+
+    return uppercaseSex == "MALE" || uppercaseSex == "FEMALE";
+}
+
+bool isValidMaritalStatus(const std::string& maritalStatus) {
+    std::string uppercaseStatus = maritalStatus;
+    std::transform(uppercaseStatus.begin(), uppercaseStatus.end(), uppercaseStatus.begin(), [](unsigned char c) {
+        return std::toupper(c);
+        });
+
+    return uppercaseStatus == "SINGLE" || uppercaseStatus == "MARRIED" ||
+        uppercaseStatus == "SEPARATED" || uppercaseStatus == "WIDOWED";
+}
+
 
 struct Node {
     std::string pcn;
@@ -58,7 +215,8 @@ public:
                     if (head == nullptr) {
                         head = current;
                         tail = current;
-                    } else {
+                    }
+                    else {
                         tail->next = current;
                         tail = current;
                     }
@@ -66,75 +224,65 @@ public:
             }
 
             file.close();
-        } else {
+        }
+        else {
             std::cout << "Failed to open file!" << std::endl;
         }
     }
 
- void updateProfilesFile() {
-    std::ofstream file(filename);
-    if (file.is_open()) {
-        Node* current = head;
-        while (current != nullptr) {
-            file << "PCN: " << current->pcn << std::endl;
-            file << current->last_name << std::endl;
-            file << current->given_name << std::endl;
-            file << current->middle_name << std::endl;
-            file << current->birthdate << std::endl;
-            file << current->sex << std::endl;
-            file << current->marital_status << std::endl;
-            file << current->blood_type << std::endl;
-            file << current->nationality << std::endl;
-            file << current->date_of_issue << std::endl;
-            file << current->email_address << std::endl;
-            file << current->home_address << std::endl;
-            file << current->tag << std::endl;
-            file << std::endl;
-            current = current->next;
+    void updateProfilesFile() {
+        std::ofstream file(filename);
+        if (file.is_open()) {
+            Node* current = head;
+            while (current != nullptr) {
+                file << "PCN: " << current->pcn << std::endl;
+                file << current->last_name << std::endl;
+                file << current->given_name << std::endl;
+                file << current->middle_name << std::endl;
+                file << current->birthdate << std::endl;
+                file << current->sex << std::endl;
+                file << current->marital_status << std::endl;
+                file << current->blood_type << std::endl;
+                file << current->nationality << std::endl;
+                file << current->date_of_issue << std::endl;
+                file << current->email_address << std::endl;
+                file << current->home_address << std::endl;
+                file << current->tag << std::endl;
+                file << std::endl;
+                current = current->next;
+            }
+            file.close();
         }
-        file.close();
-    } else {
-        std::cout << "Failed to open file!" << std::endl;
+        else {
+            std::cout << "Failed to open file!" << std::endl;
+        }
     }
-}
-
 
     void add_profile() {
         Node* new_profile = new Node;
 
-        std::cout << "Enter PCN (Ex. xxxx-xxxx-xxxx-xxxx): ";
-        std::getline(std::cin >> std::ws, new_profile->pcn);
-        std::cout << "Enter Last Name: ";
-        std::getline(std::cin >> std::ws, new_profile->last_name);
-        std::cout << "Enter Given Name: ";
-        std::getline(std::cin >> std::ws, new_profile->given_name);
-        std::cout << "Enter Middle Name: ";
-        std::getline(std::cin >> std::ws, new_profile->middle_name);
-        std::cout << "Enter Birthdate (Ex. mm/dd/yyyy): ";
-        std::getline(std::cin >> std::ws, new_profile->birthdate);
-        std::cout << "Enter Sex (Ex. Male/Female): ";
-        std::getline(std::cin >> std::ws, new_profile->sex);
-        std::cout << "Enter Marital Status (Ex. Single/Married): ";
-        std::getline(std::cin >> std::ws, new_profile->marital_status);
-        std::cout << "Enter Blood Type (Ex. O+): ";
-        std::getline(std::cin >> std::ws, new_profile->blood_type);
-        std::cout << "Enter Nationality (Ex. Filipino): ";
-        std::getline(std::cin >> std::ws, new_profile->nationality);
-        std::cout << "Enter Date of Issue: ";
-        std::getline(std::cin >> std::ws, new_profile->date_of_issue);
-        std::cout << "Enter Email Address (Ex. juandelacruz@gmail.com): ";
-        std::getline(std::cin >> std::ws, new_profile->email_address);
+        new_profile->pcn = getValidPCNInput();
+        new_profile->last_name = getValidNameInput("Last Name");
+        new_profile->given_name = getValidNameInput("Given Name");
+        new_profile->middle_name = getValidNameInput("Middle Name");
+        new_profile->birthdate = getValidDateInput("Birthdate");
+        new_profile->sex = getInput("Enter Sex (Ex. Male/Female): ", "Invalid Sex. Enter Sex: ", isValidSex);
+        new_profile->marital_status = getInput("Enter Marital Status (Ex. Single/Married/Separated/Widowed): ", "Invalid Marital Status. Enter Marital Status: ", isValidMaritalStatus);
+        new_profile->blood_type = getValidBloodTypeInput();
+        new_profile->nationality = getValidNameInput("Nationality (Ex. Filipino)");
+        new_profile->date_of_issue = getValidDateInput("Date of Issue");
+        new_profile->email_address = getValidEmailAddressInput();
         std::cout << "Enter Home Address: ";
         std::getline(std::cin >> std::ws, new_profile->home_address);
-        std::cout << "Enter Tag (Positive or Negative): ";
-        std::getline(std::cin >> std::ws, new_profile->tag);
+        new_profile->tag = getInput("Enter Tag (Positive/Negative): ", "Invalid Tag. Enter Tag: ", isValidTag);
 
         new_profile->next = nullptr;
 
         if (head == nullptr) {
             head = new_profile;
             tail = new_profile;
-        } else {
+        }
+        else {
             tail->next = new_profile;
             tail = new_profile;
         }
@@ -156,7 +304,8 @@ public:
             file << "Tag: " << new_profile->tag << std::endl;
             file << std::endl;
             file.close();
-        } else {
+        }
+        else {
             std::cout << "Failed to open file!" << std::endl;
         }
     }
@@ -165,7 +314,7 @@ public:
         std::string pcn;
         std::cout << "Enter the PCN of the profile you want to delete: ";
         std::getline(std::cin >> std::ws, pcn);
-        std::cout << std::endl; 
+        std::cout << std::endl;
 
         Node* current = head;
         Node* previous = nullptr;
@@ -177,7 +326,8 @@ public:
 
                 if (previous == nullptr) {
                     head = current->next;
-                } else {
+                }
+                else {
                     previous->next = current->next;
                 }
 
@@ -199,33 +349,32 @@ public:
         }        updateProfilesFile();
     }
 
-void display() {
-    Node* current = head;
+    void display() {
+        Node* current = head;
 
-    if (current == nullptr) {
-        std::cout << "No profile found..." << std::endl << std::endl;
-        return;
+        if (current == nullptr) {
+            std::cout << "No profile found..." << std::endl << std::endl;
+            return;
+        }
+
+        while (current != nullptr) {
+            std::cout << "PCN: " << current->pcn << std::endl;
+            std::cout << "Last Name: " << current->last_name << std::endl;
+            std::cout << "Given Name: " << current->given_name << std::endl;
+            std::cout << "Middle Name: " << current->middle_name << std::endl;
+            std::cout << "Birthdate: " << current->birthdate << std::endl;
+            std::cout << "Sex: " << current->sex << std::endl;
+            std::cout << "Marital Status: " << current->marital_status << std::endl;
+            std::cout << "Blood Type: " << current->blood_type << std::endl;
+            std::cout << "Nationality: " << current->nationality << std::endl;
+            std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
+            std::cout << "Email Address: " << current->email_address << std::endl;
+            std::cout << "Home Address: " << current->home_address << std::endl;
+            std::cout << "Tag: " << current->tag << std::endl;
+            std::cout << std::endl;
+            current = current->next;
+        }
     }
-
-    while (current != nullptr) {
-        std::cout << "PCN: " << current->pcn << std::endl;
-        std::cout << "Last Name: " << current->last_name << std::endl;
-        std::cout << "Given Name: " << current->given_name << std::endl;
-        std::cout << "Middle Name: " << current->middle_name << std::endl;
-        std::cout << "Birthdate: " << current->birthdate << std::endl;
-        std::cout << "Sex: " << current->sex << std::endl;
-        std::cout << "Marital Status: " << current->marital_status << std::endl;
-        std::cout << "Blood Type: " << current->blood_type << std::endl;
-        std::cout << "Nationality: " << current->nationality << std::endl;
-        std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
-        std::cout << "Email Address: " << current->email_address << std::endl;
-        std::cout << "Home Address: " << current->home_address << std::endl;
-        std::cout << "Tag: " << current->tag << std::endl;
-        std::cout << std::endl;
-        current = current->next;
-    }
-}
-
 
     void search() {
         std::string pcn;
@@ -288,11 +437,14 @@ int main() {
 
         if (choice == 1) {
             profile.add_profile();
-        } else if (choice == 2) {
+        }
+        else if (choice == 2) {
             profile.delete_profile();
-        } else if (choice == 3) {
+        }
+        else if (choice == 3) {
             profile.display();
-        } else if (choice == 4) {
+        }
+        else if (choice == 4) {
             profile.search();
         }
 
