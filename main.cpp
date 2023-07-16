@@ -7,6 +7,73 @@
 #include <algorithm>
 #include <ctime>
 
+bool isValidTime(const std::string& time) {
+    std::regex timePattern(R"(^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$)");
+    return std::regex_match(time, timePattern);
+}
+
+std::string getValidTimeInput(const std::string& fieldName) {
+    std::string input;
+    std::cout << "Enter " << fieldName << " (HH:MM): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidTime(input)) {
+        std::cout << "Invalid " << fieldName << ". Enter " << fieldName << " (HH:MM): ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
+bool isValidEntryDate(const std::string& entryDate) {
+    std::regex datePattern(R"(^\d{4}-\d{2}-\d{2}$)");
+
+    if (!std::regex_match(entryDate, datePattern)) {
+        return false;
+    }
+
+    int year = std::stoi(entryDate.substr(0, 4));
+    int month = std::stoi(entryDate.substr(5, 2));
+    int day = std::stoi(entryDate.substr(8, 2));
+
+    std::tm tm = {};
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+
+    std::time_t time = std::mktime(&tm);
+
+    if (time == -1) {
+        return false;
+    }
+
+    std::tm validatedTime;
+    if (localtime_s(&validatedTime, &time) != 0) {
+        return false;
+    }
+
+    char buffer[80];
+    if (std::strftime(buffer, sizeof(buffer), "%Y-%m-%d", &validatedTime) == 0) {
+        return false;
+    }
+
+    return validatedTime.tm_year == (year - 1900) && validatedTime.tm_mon == (month - 1) && validatedTime.tm_mday == day;
+}
+
+
+std::string getValidEntryDateInput(const std::string& fieldName) {
+    std::string input;
+    std::cout << "Enter " << fieldName << " (YYYY-MM-DD): ";
+    std::getline(std::cin >> std::ws, input);
+
+    while (!isValidEntryDate(input)) {
+        std::cout << "Invalid " << fieldName << ". Enter " << fieldName << " (YYYY-MM-DD): ";
+        std::getline(std::cin >> std::ws, input);
+    }
+
+    return input;
+}
+
 bool isValidPCN(const std::string& pcn) {
     std::regex pcnPattern(R"(\d{4}-\d{4}-\d{4}-\d{4})");
     return std::regex_match(pcn, pcnPattern);
@@ -23,7 +90,7 @@ std::string getValidPCNInput() {
     }
 
     return input;
-} 
+}
 
 bool isValidName(const std::string& name) {
     bool capitalLetterExpected = true;
@@ -174,6 +241,9 @@ struct Node {
     std::string date_of_issue;
     std::string email_address;
     std::string home_address;
+    std::string entry_date;
+    std::string entry_time;
+    std::string exit_time;
     std::string tag;
     Node* next = nullptr;
 };
@@ -209,6 +279,9 @@ public:
                     std::getline(file, current->date_of_issue);
                     std::getline(file, current->email_address);
                     std::getline(file, current->home_address);
+                    std::getline(file, current->entry_date);
+                    std::getline(file, current->entry_time);
+                    std::getline(file, current->exit_time);
                     std::getline(file, current->tag);
 
                     current->next = nullptr;
@@ -248,6 +321,9 @@ public:
                 file << current->date_of_issue << std::endl;
                 file << current->email_address << std::endl;
                 file << current->home_address << std::endl;
+                file << current->entry_date << std::endl;
+                file << current->entry_time << std::endl;
+                file << current->exit_time << std::endl;
                 file << current->tag << std::endl;
                 file << std::endl;
                 current = current->next;
@@ -275,7 +351,10 @@ public:
         new_profile->email_address = getValidEmailAddressInput();
         std::cout << "Enter Home Address: ";
         std::getline(std::cin >> std::ws, new_profile->home_address);
-        new_profile->tag = getInput("Enter Tag (Positive/Negative): ", "Invalid Tag. Enter Tag: ", isValidTag);
+        new_profile->entry_date = getValidEntryDateInput("Entry Date");
+        new_profile->entry_time = getValidTimeInput("Entry Time");
+        new_profile->exit_time = getValidTimeInput("Exit Time");
+        new_profile->tag = "Negative"; // Assign default value "NEGATIVE" to tag
 
         new_profile->next = nullptr;
 
@@ -302,6 +381,9 @@ public:
             file << "Date of Issue: " << new_profile->date_of_issue << std::endl;
             file << "Email Address: " << new_profile->email_address << std::endl;
             file << "Home Address: " << new_profile->home_address << std::endl;
+            file << "Entry Date: " << new_profile->entry_date << std::endl;
+            file << "Entry Time: " << new_profile->entry_time << std::endl;
+            file << "Exit Time: " << new_profile->exit_time << std::endl;
             file << "Tag: " << new_profile->tag << std::endl;
             file << std::endl;
             file.close();
@@ -310,6 +392,7 @@ public:
             std::cout << "Failed to open file!" << std::endl;
         }
     }
+
 
     void delete_profile() {
         std::string pcn;
@@ -347,7 +430,8 @@ public:
 
         if (!found) {
             std::cout << "The profile with PCN: " << pcn << " does not exist" << std::endl << std::endl;
-        }        updateProfilesFile();
+        }
+        updateProfilesFile();
     }
     void update_tag(const std::string& pcn, const std::string& tag) {
         std::fstream file(filename, std::ios::in | std::ios::out);
@@ -399,9 +483,6 @@ public:
         updateProfilesFile();
     }
 
-
-
-
     void display() {
         Node* current = head;
 
@@ -423,13 +504,14 @@ public:
             std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
             std::cout << "Email Address: " << current->email_address << std::endl;
             std::cout << "Home Address: " << current->home_address << std::endl;
+            std::cout << "Entry Date: " << current->entry_date << std::endl;
+            std::cout << "Entry Time: " << current->entry_time << std::endl;
+            std::cout << "Exit Time: " << current->exit_time << std::endl;
             std::cout << "Tag: " << current->tag << std::endl;
             std::cout << std::endl;
             current = current->next;
         }
     }
-
-
 
     void search() {
         std::string pcn;
@@ -452,8 +534,13 @@ public:
                 std::cout << "Nationality: " << current->nationality << std::endl;
                 std::cout << "Date of Issue: " << current->date_of_issue << std::endl;
                 std::cout << "Email Address: " << current->email_address << std::endl;
+                std::cout << "Home Address: " << current->home_address << std::endl;
+                std::cout << "Entry Date: " << current->entry_date << std::endl;
+                std::cout << "Entry Time: " << current->entry_time << std::endl;
+                std::cout << "Exit Time: " << current->exit_time << std::endl;
                 std::cout << "Tag: " << current->tag << std::endl;
                 std::cout << std::endl;
+                break;
             }
             current = current->next;
         }
@@ -465,86 +552,54 @@ public:
 };
 
 int main() {
-    Profile profile;
+    Profile profileSystem;
     int choice;
 
     do {
-        system("cls");
-        std::cout << "PROFILE ADD/DELETE/DISPLAY/SEARCH" << std::endl << std::endl;
-        std::cout << "[1] ADD PROFILE" << std::endl;
-        std::cout << "[2] DELETE PROFILE" << std::endl;
-        std::cout << "[3] UPDATE PROFILE TAG" << std::endl;
-        std::cout << "[4] DISPLAY ALL PROFILES" << std::endl;
-       std::cout << "[5] DISPLAY CLOSE CONTACTS OF A POSITIVE CASE" << std::endl;
-        std::cout << "[6] SEARCH PROFILE" << std::endl;
-        std::cout << "[7] EXIT PROGRAM" << std::endl << std::endl;
-        std::cout << "ENTER CHOICE (1-7): ";
+        std::cout << "1. Add Profile" << std::endl;
+        std::cout << "2. Delete Profile" << std::endl;
+        std::cout << "3. Update Tag" << std::endl;
+        std::cout << "4. Display All Profiles" << std::endl;
+        std::cout << "5. Search Profile" << std::endl;
+        std::cout << "0. Exit" << std::endl;
+        std::cout << "Enter your choice: ";
         std::cin >> choice;
 
-        while (choice < 1 || choice > 7) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "ENTER CHOICE (1-7): ";
-            std::cin >> choice;
-        }
+        std::cout << std::endl;
 
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-        system("cls");
-
-        if (choice == 1) {
-            profile.add_profile();
-        }
-        else if (choice == 2) {
-            profile.delete_profile();
-        }  
-        
-        else if (choice == 3) {
-            std::string pcn;
-            std::cout << "Enter the PCN of the profile you want to update: ";
+        switch (choice) {
+        case 1:
+            profileSystem.add_profile();
+            break;
+        case 2:
+            profileSystem.delete_profile();
+            break;
+        case 3: {
+            std::string pcn, tag;
+            std::cout << "Enter PCN: ";
             std::getline(std::cin >> std::ws, pcn);
-            std::cout << std::endl;
-
-            std::string tag;
-            std::cout << "Enter the new tag (Positive/Negative): ";
+            std::cout << "Enter Tag: ";
             std::getline(std::cin >> std::ws, tag);
-            std::cout << std::endl;
-
-            profile.update_tag(pcn, tag);
+            profileSystem.update_tag(pcn, tag);
+            break;
         }
-       
-        else if (choice == 4) {
-            profile.display();
-        }
-
-        /*else if (choice == 5) {
-   std::string positivePCN;
-   std::cout << "Enter the PCN of the positive profile: ";
-   std::getline(std::cin >> std::ws, positivePCN);
-
-   Node* current = profile.getHead();
-   while (current != nullptr) {
-       if (current->pcn == positivePCN && current->tag == "Positive") {
-           profile.displayCloseContacts(current);
-           break;
-       }
-       current = current->next;
-   }
-   if (current == nullptr) {
-       std::cout << "Positive profile not found!\n";
-   }
-}*/
-
-  
-        else if (choice == 6) {
-            profile.search();
+        case 4:
+            profileSystem.display();
+            break;
+        case 5:
+            profileSystem.search();
+            break;
+        case 0:
+            std::cout << "Exiting..." << std::endl;
+            break;
+        default:
+            std::cout << "Invalid choice. Please try again." << std::endl;
+            break;
         }
 
-        profile.updateProfilesFile();
+        std::cout << std::endl;
 
-        system("pause");
-    } while (choice != 7);
+    } while (choice != 0);
 
-    std::cout << "Exiting Program..." << std::endl << std::endl;
     return 0;
 }
