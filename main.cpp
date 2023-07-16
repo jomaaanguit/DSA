@@ -5,6 +5,7 @@
 #include <regex>
 #include <cctype>
 #include <algorithm>
+#include <ctime>
 
 bool isValidPCN(const std::string& pcn) {
     std::regex pcnPattern(R"(\d{4}-\d{4}-\d{4}-\d{4})");
@@ -22,7 +23,7 @@ std::string getValidPCNInput() {
     }
 
     return input;
-}
+} 
 
 bool isValidName(const std::string& name) {
     bool capitalLetterExpected = true;
@@ -348,6 +349,58 @@ public:
             std::cout << "The profile with PCN: " << pcn << " does not exist" << std::endl << std::endl;
         }        updateProfilesFile();
     }
+    void update_tag(const std::string& pcn, const std::string& tag) {
+        std::fstream file(filename, std::ios::in | std::ios::out);
+        if (file.is_open()) {
+            std::string line;
+            bool profileFound = false;
+
+            if (!isValidPCN(pcn)) {
+                std::cout << "Invalid PCN format. Update failed." << std::endl;
+                return;
+            }
+
+            if (!isValidTag(tag)) {
+                std::cout << "Invalid tag. Update failed." << std::endl;
+                return;
+            }
+
+            while (std::getline(file, line)) {
+                if (line.find("PCN: " + pcn) != std::string::npos) {
+                    // Found the matching PCN, update the tag
+                    profileFound = true;
+                    file.seekp(file.tellg()); // Move write position to the current line
+                    file << "Tag: " << tag << std::endl;
+                    std::cout << "Tag updated successfully!" << std::endl;
+                    break;
+                }
+            }
+
+            if (!profileFound) {
+                std::cout << "Profile with PCN " << pcn << " not found." << std::endl;
+            }
+
+            file.close();
+        }
+        else {
+            std::cout << "Failed to open file!" << std::endl;
+        }
+
+        // Update the profiles in memory and save to file
+        Node* current = head;
+        while (current != nullptr) {
+            if (current->pcn == pcn) {
+                current->tag = tag;
+                break;
+            }
+            current = current->next;
+        }
+
+        updateProfilesFile();
+    }
+
+
+
 
     void display() {
         Node* current = head;
@@ -375,6 +428,8 @@ public:
             current = current->next;
         }
     }
+
+
 
     void search() {
         std::string pcn;
@@ -418,16 +473,18 @@ int main() {
         std::cout << "PROFILE ADD/DELETE/DISPLAY/SEARCH" << std::endl << std::endl;
         std::cout << "[1] ADD PROFILE" << std::endl;
         std::cout << "[2] DELETE PROFILE" << std::endl;
-        std::cout << "[3] DISPLAY ALL PROFILES" << std::endl;
-        std::cout << "[4] SEARCH PROFILE" << std::endl;
-        std::cout << "[5] EXIT PROGRAM" << std::endl << std::endl;
-        std::cout << "ENTER CHOICE (1-5): ";
+        std::cout << "[3] UPDATE PROFILE TAG" << std::endl;
+        std::cout << "[4] DISPLAY ALL PROFILES" << std::endl;
+       std::cout << "[5] DISPLAY CLOSE CONTACTS OF A POSITIVE CASE" << std::endl;
+        std::cout << "[6] SEARCH PROFILE" << std::endl;
+        std::cout << "[7] EXIT PROGRAM" << std::endl << std::endl;
+        std::cout << "ENTER CHOICE (1-7): ";
         std::cin >> choice;
 
-        while (choice < 1 || choice > 5) {
+        while (choice < 1 || choice > 7) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "ENTER CHOICE (1-5): ";
+            std::cout << "ENTER CHOICE (1-7): ";
             std::cin >> choice;
         }
 
@@ -440,18 +497,53 @@ int main() {
         }
         else if (choice == 2) {
             profile.delete_profile();
-        }
+        }  
+        
         else if (choice == 3) {
+            std::string pcn;
+            std::cout << "Enter the PCN of the profile you want to update: ";
+            std::getline(std::cin >> std::ws, pcn);
+            std::cout << std::endl;
+
+            std::string tag;
+            std::cout << "Enter the new tag (Positive/Negative): ";
+            std::getline(std::cin >> std::ws, tag);
+            std::cout << std::endl;
+
+            profile.update_tag(pcn, tag);
+        }
+       
+        else if (choice == 4) {
             profile.display();
         }
-        else if (choice == 4) {
+
+        /*else if (choice == 5) {
+   std::string positivePCN;
+   std::cout << "Enter the PCN of the positive profile: ";
+   std::getline(std::cin >> std::ws, positivePCN);
+
+   Node* current = profile.getHead();
+   while (current != nullptr) {
+       if (current->pcn == positivePCN && current->tag == "Positive") {
+           profile.displayCloseContacts(current);
+           break;
+       }
+       current = current->next;
+   }
+   if (current == nullptr) {
+       std::cout << "Positive profile not found!\n";
+   }
+}*/
+
+  
+        else if (choice == 6) {
             profile.search();
         }
 
         profile.updateProfilesFile();
 
         system("pause");
-    } while (choice != 5);
+    } while (choice != 7);
 
     std::cout << "Exiting Program..." << std::endl << std::endl;
     return 0;
