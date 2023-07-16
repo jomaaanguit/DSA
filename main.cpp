@@ -164,7 +164,7 @@ public:
     void delete_profile() {
         std::string pcn;
         std::cout << "Enter the PCN of the profile you want to delete: ";
-        std::cin >> pcn;
+        std::getline(std::cin >> std::ws, pcn);
         std::cout << std::endl; 
 
         Node* current = head;
@@ -230,7 +230,7 @@ void display() {
     void search() {
         std::string pcn;
         std::cout << "Enter the PCN of the profile you want to search: ";
-        std::cin >> pcn;
+        std::getline(std::cin >> std::ws, pcn);
         std::cout << std::endl;
 
         Node* current = head;
