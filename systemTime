@@ -1,0 +1,263 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+
+struct Profile {
+    std::string name;
+    std::tm entryDate;
+    std::string entryTime;
+    std::string exitTime;
+    std::string tag;
+    Profile* next;
+};
+
+// Function to add a new profile to the linked list
+void addProfile(Profile*& head) {
+    Profile* newProfile = new Profile;
+    std::cout << "Enter name: ";
+    std::cin >> newProfile->name;
+
+    // Check if the profile with the same name already exists
+    Profile* current = head;
+    while (current != nullptr) {
+        if (current->name == newProfile->name) {
+            newProfile->tag = current->tag; // Set the same tag as the existing profile
+            break;
+        }
+        current = current->next;
+    }
+
+    std::cout << "Enter entry date (YYYY-MM-DD): ";
+    std::string entryDateStr;
+    std::cin >> entryDateStr;
+
+    int year = std::stoi(entryDateStr.substr(0, 4));
+    int month = std::stoi(entryDateStr.substr(5, 2));
+    int day = std::stoi(entryDateStr.substr(8, 2));
+
+    std::tm tm = {};
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+
+    newProfile->entryDate = tm;
+    std::cout << "Enter entry time (HH:MM): ";
+    std::cin >> newProfile->entryTime;
+    std::cout << "Enter exit time (HH:MM): ";
+    std::cin >> newProfile->exitTime;
+    newProfile->tag = "Negative";
+    newProfile->next = nullptr;
+
+    if (head == nullptr) {
+        head = newProfile;
+    } else {
+        Profile* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newProfile;
+    }
+
+    std::cout << "Profile added successfully!\n";
+}
+
+// Function to update the tag of profiles with the same name
+void updateTag(Profile* head, const std::string& name, const std::string& tag) {
+    Profile* current = head;
+    while (current != nullptr) {
+        if (current->name == name) {
+            current->tag = tag;
+        }
+        current = current->next;
+    }
+}
+
+// Function to delete a profile by name
+void deleteProfile(Profile*& head, const std::string& name) {
+    Profile* current = head;
+    Profile* previous = nullptr;
+
+    while (current != nullptr) {
+        if (current->name == name) {
+            if (previous == nullptr) {
+                head = current->next;
+            } else {
+                previous->next = current->next;
+            }
+
+            delete current;
+            std::cout << "Profile deleted successfully!\n";
+            return;
+        }
+
+        previous = current;
+        current = current->next;
+    }
+
+    std::cout << "Profile not found!\n";
+}
+
+// Function to check if two profiles have overlapping time intervals
+bool hasOverlap(const Profile* profile1, const Profile* profile2) {
+    return (profile1->entryTime <= profile2->exitTime) && (profile1->exitTime >= profile2->entryTime);
+}
+
+/*
+// Function to display the close contacts of a positive profile
+void displayCloseContacts(const Profile* head, const Profile* positiveProfile) {
+    std::cout << "Close contacts of " << positiveProfile->name << ":\n";
+
+    const Profile* current = head;
+    while (current != nullptr) {
+        if (current != positiveProfile && current->tag == "Negative") {
+            std::tm entryDate = current->entryDate;
+            std::time_t entryTimestamp = std::mktime(&entryDate);
+
+            if (entryDate.tm_year == positiveProfile->entryDate.tm_year &&
+                entryDate.tm_mon == positiveProfile->entryDate.tm_mon &&
+                entryDate.tm_mday == positiveProfile->entryDate.tm_mday) {
+                if (hasOverlap(current, positiveProfile)) {
+                    std::cout << "- " << current->name << '\n';
+                }
+            }
+        }
+        current = current->next;
+    }
+} 
+*/
+
+void displayCloseContacts(const Profile* head, const Profile* positiveProfile) {
+    std::cout << "Close contacts of " << positiveProfile->name << ":\n";1
+
+    const Profile* current = head;
+    while (current != nullptr) {
+        if (current != positiveProfile && current->tag == "Negative") {
+            const Profile* positiveOccurrence = positiveProfile;
+
+            while (positiveOccurrence != nullptr) {
+                if (positiveOccurrence->entryDate.tm_year == current->entryDate.tm_year &&
+                    positiveOccurrence->entryDate.tm_mon == current->entryDate.tm_mon &&
+                    positiveOccurrence->entryDate.tm_mday == current->entryDate.tm_mday) {
+
+                    if (hasOverlap(current, positiveOccurrence)) {
+                        std::cout << "- " << current->name << '\n';
+                        break; // Exit the loop since overlap found for this positive occurrence
+                    }
+                }
+
+                positiveOccurrence = positiveOccurrence->next;
+            }
+        }
+        current = current->next;
+    }
+}
+
+  
+
+
+// Function to display all the profiles in the linked list
+void displayProfiles(const Profile* head) {
+    if (head == nullptr) {
+        std::cout << "No profiles found.\n";
+        return;
+    }
+
+    std::cout << "Profiles entered:\n";
+    int count = 1;
+    const Profile* current = head;
+    while (current != nullptr) {
+        std::cout << "Profile " << count << ":\n";
+        std::cout << "Name: " << current->name << '\n';
+        std::cout << "Entry Date: " << std::to_string(current->entryDate.tm_year + 1900) + "-"
+                  << std::to_string(current->entryDate.tm_mon + 1) + "-"
+                  << std::to_string(current->entryDate.tm_mday) << '\n';
+        std::cout << "Entry Time: " << current->entryTime << '\n';
+        std::cout << "Exit Time: " << current->exitTime << '\n';
+        std::cout << "Tag: " << current->tag << '\n';
+        std::cout << '\n';
+        current = current->next;
+        count++;
+    }
+}
+
+// Function to delete all the profiles in the linked list and free memory
+void deleteProfiles(Profile*& head) {
+    while (head != nullptr) {
+        Profile* temp = head;
+        head = head->next;
+        delete temp;
+    }
+}
+
+int main() {
+    Profile* head = nullptr;
+    int choice;
+
+    do {
+        std::cout << "\n----- Profile Management -----\n";
+        std::cout << "1. Add a profile\n";
+        std::cout << "2. Update profile tag (Positive/Negative)\n";
+        std::cout << "3. Delete a profile\n";
+        std::cout << "4. Display profiles\n";
+        std::cout << "5. Display close contacts of a positive profile\n";
+        std::cout << "6. Exit\n";
+        std::cout << "-----------------------------\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addProfile(head);
+                break;
+            case 2: {
+                std::string name;
+                std::string tag;
+                std::cout << "Enter the name of the profile: ";
+                std::cin >> name;
+                std::cout << "Enter tag (Positive/Negative): ";
+                std::cin >> tag;
+                updateTag(head, name, tag);
+                std::cout << "Tag updated successfully!\n";
+                break;
+            }
+            case 3: {
+                std::string name;
+                std::cout << "Enter the name of the profile to delete: ";
+                std::cin >> name;
+                deleteProfile(head, name);
+                break;
+            }
+            case 4:
+                displayProfiles(head);
+                break;
+            case 5: {
+                std::string positiveName;
+                std::cout << "Enter the name of the positive profile: ";
+                std::cin >> positiveName;
+
+                Profile* current = head;
+                while (current != nullptr) {
+                    if (current->name == positiveName && current->tag == "Positive") {
+                        displayCloseContacts(head, current);
+                        break;
+                    }
+                    current = current->next;
+                }
+                if (current == nullptr) {
+                    std::cout << "Positive profile not found!\n";
+                }
+                break;
+            }
+            case 6:
+                std::cout << "Exiting...\n";
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again.\n";
+                break;
+        }
+    } while (choice != 6);
+
+   deleteProfiles(head); // Free memory before exiting
+
+    return 0;
+}
