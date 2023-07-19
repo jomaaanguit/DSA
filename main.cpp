@@ -632,6 +632,8 @@ int main() {
     int choice;
 
     do {
+        std::cout << "NID TRACER" << std::endl;
+        std::cout << "A National ID-Based Contact Tracing System" << std::endl;
         std::cout << "1. Add Profile" << std::endl;
         std::cout << "2. Delete Profile" << std::endl;
         std::cout << "3. Update Tag" << std::endl;
