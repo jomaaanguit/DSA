@@ -642,19 +642,32 @@ int main() {
         std::cout << "5. Search Profile" << std::endl;
         std::cout << "0. Exit" << std::endl << std::endl;
         std::cout << "Enter your choice: ";
-        std::cin >> choice;
 
+        while (!(std::cin >> choice) || choice != 1 && choice != 2 && choice != 3 && choice != 4 && choice != 5 && choice != 0)
+        {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            std::cout << "Enter your choice: ";
+            
+            /*if (std::cin >> choice)
+                break;*/
+        }
         std::cout << std::endl;
 
         system("cls");
 
         switch (choice) {
         case 1:
+        {
             profileSystem.add_profile();
             break;
+        }
         case 2:
+        {
             profileSystem.delete_profile();
+            system("pause");
             break;
+        }
         case 3: {
             std::string pcn, tag;
             std::cout << "Enter PCN: ";
@@ -694,13 +707,13 @@ int main() {
             break;
         }
         case 5:
+        {
             profileSystem.search();
+            system("pause");
             break;
+        }
         case 0:
             std::cout << "Exiting..." << std::endl;
-            break;
-        default:
-            std::cout << "Invalid choice. Please try again." << std::endl;
             break;
         }
 
