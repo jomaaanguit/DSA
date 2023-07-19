@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <limits>
 #include <regex>
 #include <cctype>
 #include <algorithm>
@@ -68,24 +67,6 @@ std::string getValidEntryDateInput(const std::string& fieldName) {
 
     while (!isValidEntryDate(input)) {
         std::cout << "Invalid " << fieldName << ". Enter " << fieldName << " (YYYY-MM-DD): ";
-        std::getline(std::cin >> std::ws, input);
-    }
-
-    return input;
-}
-
-bool isValidPCN(const std::string& pcn) {
-    std::regex pcnPattern(R"(\d{4}-\d{4}-\d{4}-\d{4})");
-    return std::regex_match(pcn, pcnPattern);
-}
-
-std::string getValidPCNInput() {
-    std::string input;
-    std::cout << "Enter PCN (xxxx-xxxx-xxxx-xxxx): ";
-    std::getline(std::cin >> std::ws, input);
-
-    while (!isValidPCN(input)) {
-        std::cout << "Invalid PCN format. Enter PCN: ";
         std::getline(std::cin >> std::ws, input);
     }
 
@@ -335,6 +316,39 @@ public:
         }
     }
 
+    bool isDuplicatePCN(const std::string& pcn) {
+        Node* current = head;
+        while (current != nullptr) {
+            if (current->pcn == pcn) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+    bool isValidPCN(const std::string& pcn) {
+        std::regex pcnPattern(R"(\d{4}-\d{4}-\d{4}-\d{4})");
+        return std::regex_match(pcn, pcnPattern);
+    }
+
+    std::string getValidPCNInput() {
+        std::string input;
+        std::cout << "Enter PCN (xxxx-xxxx-xxxx-xxxx): ";
+        std::getline(std::cin >> std::ws, input);
+
+        while (!isValidPCN(input) || isDuplicatePCN(input)) {
+            if (!isValidPCN(input)) {
+                std::cout << "Invalid PCN format. Enter PCN: ";
+            }
+            else {
+                std::cout << "PCN already exists. Enter PCN: ";
+            }
+            std::getline(std::cin >> std::ws, input);
+        }
+
+        return input;
+    }
+
     void add_profile() {
         Node* new_profile = new Node;
 
@@ -370,21 +384,21 @@ public:
         std::ofstream file(filename, std::ios::app);
         if (file.is_open()) {
             file << "PCN: " << new_profile->pcn << std::endl;
-            file << "Last Name: " << new_profile->last_name << std::endl;
-            file << "Given Name: " << new_profile->given_name << std::endl;
-            file << "Middle Name: " << new_profile->middle_name << std::endl;
-            file << "Birthdate: " << new_profile->birthdate << std::endl;
-            file << "Sex: " << new_profile->sex << std::endl;
-            file << "Marital Status: " << new_profile->marital_status << std::endl;
-            file << "Blood Type: " << new_profile->blood_type << std::endl;
-            file << "Nationality: " << new_profile->nationality << std::endl;
-            file << "Date of Issue: " << new_profile->date_of_issue << std::endl;
-            file << "Email Address: " << new_profile->email_address << std::endl;
-            file << "Home Address: " << new_profile->home_address << std::endl;
-            file << "Entry Date: " << new_profile->entry_date << std::endl;
-            file << "Entry Time: " << new_profile->entry_time << std::endl;
-            file << "Exit Time: " << new_profile->exit_time << std::endl;
-            file << "Tag: " << new_profile->tag << std::endl;
+            file << new_profile->last_name << std::endl;
+            file << new_profile->given_name << std::endl;
+            file << new_profile->middle_name << std::endl;
+            file << new_profile->birthdate << std::endl;
+            file << new_profile->sex << std::endl;
+            file << new_profile->marital_status << std::endl;
+            file << new_profile->blood_type << std::endl;
+            file << new_profile->nationality << std::endl;
+            file << new_profile->date_of_issue << std::endl;
+            file << new_profile->email_address << std::endl;
+            file << new_profile->home_address << std::endl;
+            file << new_profile->entry_date << std::endl;
+            file << new_profile->entry_time << std::endl;
+            file << new_profile->exit_time << std::endl;
+            file << new_profile->tag << std::endl;
             file << std::endl;
             file.close();
         }
@@ -513,6 +527,68 @@ public:
         }
     }
 
+    void displayCloseContacts() {
+        std::string pcn;
+        std::cout << "Enter PCN: ";
+        std::getline(std::cin >> std::ws, pcn);
+        std::cout << std::endl;
+
+        Node* current = head;
+        Node* enteredProfile = nullptr;
+        bool found = false;
+        bool closeContactsFound = false;  // Flag to track if any close contacts are found
+
+        // Find the entered PCN profile
+        while (current != nullptr) {
+            if (current->pcn == pcn) {
+                enteredProfile = current;
+                found = true;
+                break;
+            }
+            current = current->next;
+        }
+
+        if (!found) {
+            std::cout << "The profile with PCN: " << pcn << " does not exist" << std::endl << std::endl;
+            return;
+        }
+
+        if (enteredProfile->tag == "Positive") {
+            std::cout << "Close Contacts of PCN: " << pcn << std::endl;
+            std::cout << "Entry Date: " << enteredProfile->entry_date << std::endl;
+            std::cout << "Entry Time: " << enteredProfile->entry_time << std::endl;
+            std::cout << "Exit Time: " << enteredProfile->exit_time << std::endl;
+
+            std::cout << "Close Contacts:" << std::endl;
+            current = head;
+
+            while (current != nullptr) {
+                if (current != enteredProfile) {
+                    // Check if the entry date, entry time, and exit time overlap with the entered PCN
+                    if (current->entry_date == enteredProfile->entry_date &&
+                        ((current->entry_time >= enteredProfile->entry_time && current->entry_time < enteredProfile->exit_time) ||
+                            (current->exit_time > enteredProfile->entry_time && current->exit_time <= enteredProfile->exit_time) ||
+                            (current->entry_time <= enteredProfile->entry_time && current->exit_time >= enteredProfile->exit_time))) {
+                        std::cout << "PCN: " << current->pcn << std::endl;
+                        // Output other details of the close contact profile
+                        // ...
+                        closeContactsFound = true;
+                    }
+                }
+                current = current->next;
+            }
+
+            if (!closeContactsFound) {
+                std::cout << "No Close Contacts Found!" << std::endl;
+            }
+        }
+        else if (enteredProfile->tag == "Negative") {
+            std::cout << "The profile with PCN: " << pcn << " is marked as negative." << std::endl;
+            std::cout << "Please enter a PCN with the 'Positive' tag to display close contacts." << std::endl;
+            displayCloseContacts();  // Recursively call the function to take input again
+        }
+    }
+
     void search() {
         std::string pcn;
         std::cout << "Enter the PCN of the profile you want to search: ";
@@ -559,7 +635,7 @@ int main() {
         std::cout << "1. Add Profile" << std::endl;
         std::cout << "2. Delete Profile" << std::endl;
         std::cout << "3. Update Tag" << std::endl;
-        std::cout << "4. Display All Profiles" << std::endl;
+        std::cout << "4. Display" << std::endl;
         std::cout << "5. Search Profile" << std::endl;
         std::cout << "0. Exit" << std::endl;
         std::cout << "Enter your choice: ";
@@ -584,8 +660,28 @@ int main() {
             break;
         }
         case 4:
-            profileSystem.display();
+        {
+            std::cout << "1. Display All Profiles" << std::endl;
+            std::cout << "2. Display Close Contacts of PCN:" << std::endl;
+            std::cout << "Enter your choice: ";
+            std::cin >> choice;
+
+            while (choice != 1 && choice != 2)
+            {
+                std::cin.clear();
+                std::cin.ignore(100, '\n');
+                std::cout << "Enter your choice: ";
+                std::cin >> choice;
+            }
+            if (choice == 1)
+                profileSystem.display();
+            else if (choice == 2)
+            {
+                std::cout << "Close Contacts ";
+                profileSystem.displayCloseContacts();
+            }   
             break;
+        }
         case 5:
             profileSystem.search();
             break;
