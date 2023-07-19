@@ -123,7 +123,7 @@ std::string getValidDateInput(const std::string& fieldName) {
     std::getline(std::cin >> std::ws, input);
 
     while (!isValidDate(input)) {
-        std::cout << "Invalid " << fieldName << ". Enter " << fieldName;
+        std::cout << "Invalid " << fieldName << ". Enter " << fieldName << ": ";
         std::getline(std::cin >> std::ws, input);
     }
 
@@ -584,8 +584,8 @@ public:
         }
         else if (enteredProfile->tag == "Negative") {
             std::cout << "The profile with PCN: " << pcn << " is marked as negative." << std::endl;
-            std::cout << "Please enter a PCN with the 'Positive' tag to display close contacts." << std::endl;
-            displayCloseContacts();  // Recursively call the function to take input again
+            //std::cout << "Please enter a PCN with the 'Positive' tag to display close contacts." << std::endl;
+            //displayCloseContacts();  // Recursively call the function to take input again
         }
     }
 
@@ -629,9 +629,10 @@ public:
 
 int main() {
     Profile profileSystem;
-    int choice;
+    int choice{};
 
     do {
+        system("cls");
         std::cout << "NID TRACER" << std::endl;
         std::cout << "A National ID-Based Contact Tracing System" << std::endl;
         std::cout << "1. Add Profile" << std::endl;
@@ -639,11 +640,13 @@ int main() {
         std::cout << "3. Update Tag" << std::endl;
         std::cout << "4. Display" << std::endl;
         std::cout << "5. Search Profile" << std::endl;
-        std::cout << "0. Exit" << std::endl;
+        std::cout << "0. Exit" << std::endl << std::endl;
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         std::cout << std::endl;
+
+        system("cls");
 
         switch (choice) {
         case 1:
@@ -659,14 +662,16 @@ int main() {
             std::cout << "Enter Tag: ";
             std::getline(std::cin >> std::ws, tag);
             profileSystem.update_tag(pcn, tag);
+            system("pause");
             break;
         }
         case 4:
         {
             std::cout << "1. Display All Profiles" << std::endl;
-            std::cout << "2. Display Close Contacts of PCN:" << std::endl;
+            std::cout << "2. Display Close Contacts of PCN:" << std::endl << std::endl;
             std::cout << "Enter your choice: ";
             std::cin >> choice;
+            std::cout << std::endl;
 
             while (choice != 1 && choice != 2)
             {
@@ -676,11 +681,15 @@ int main() {
                 std::cin >> choice;
             }
             if (choice == 1)
+            {
                 profileSystem.display();
+                system("pause");
+            }
             else if (choice == 2)
             {
                 std::cout << "Close Contacts ";
                 profileSystem.displayCloseContacts();
+                system("pause");
             }   
             break;
         }
